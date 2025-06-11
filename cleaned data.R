@@ -44,3 +44,22 @@ clean_data <- clean_data %>%
     Groei_PIR = (Prijs.Inkomensratio - lag(Prijs.Inkomensratio)) / lag(Prijs.Inkomensratio)
   ) %>%
   ungroup()
+
+#nieuwe tabel aangemaakt voor shapefiles
+data_2019 <- clean_data %>%
+  filter(Perioden == 2019) %>%
+  select(Regio.s, PIR_2019 = 5)
+
+data_2023 <- clean_data %>%
+  filter(Perioden == 2023) %>%
+  select(Regio.s, PIR_2023 = 5)
+
+pir_data <- merge(data_2019, data_2023, by = "Regio.s")
+
+#installeren en inladen van de cbs shapefile
+install.packages("cbsodataR")
+library(cbsodataR)
+install.packages("sf")
+install.packages("ggplot2")
+library(sf)
+library(ggplot2)
