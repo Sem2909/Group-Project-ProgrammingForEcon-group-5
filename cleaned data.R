@@ -70,17 +70,19 @@ head(gemeente_map)
 
 colnames(pir_data)[which(colnames(pir_data) == "Regio.s")] <- "statnaam"
 kaart_met_data <- left_join(gemeente_map, pir_data, by = "statnaam")
-ggplot(kaart_met_data) +
-  geom_sf(aes(fill = PIR_2023), color = "white") +
-  scale_fill_viridis_c(option = "C", na.value = "grey90") +
-  labs(title = "Prijs/Inkomensratio per Gemeente (2023)", fill = "PIR") +
-  theme_minimal()
 
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2019), color = "white") +
   scale_fill_viridis_c(option = "C", na.value = "grey90") +
   labs(title = "Prijs/Inkomensratio per Gemeente (2019)", fill = "PIR") +
   theme_minimal()
+
+ggplot(kaart_met_data) +
+  geom_sf(aes(fill = PIR_2023), color = "white") +
+  scale_fill_viridis_c(option = "C", na.value = "grey90") +
+  labs(title = "Prijs/Inkomensratio per Gemeente (2023)", fill = "PIR") +
+  theme_minimal()
+
 
 
 
