@@ -56,7 +56,7 @@ data_2023 <- clean_data %>%
 
 pir_data <- merge(data_2019, data_2023, by = "Regio.s")
 
-#installeren en inladen van de cbs shapefile
+#installeren en inladen van de benodigde packages
 install.packages("cbsodataR")
 library(cbsodataR)
 install.packages("sf")
@@ -64,10 +64,11 @@ install.packages("ggplot2")
 library(sf)
 library(ggplot2)
 
-
+#laad shapefile
 gemeente_map <- cbs_get_sf("gemeente", 2023, verbose = TRUE)
 head(gemeente_map)
 
+#een nieuwe dataset maken waarbij de juiste data word samengevoegd voor de shapefile om te werken
 colnames(pir_data)[which(colnames(pir_data) == "Regio.s")] <- "statnaam"
 kaart_met_data <- left_join(gemeente_map, pir_data, by = "statnaam")
 
