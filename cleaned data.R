@@ -85,5 +85,39 @@ ggplot(kaart_met_data) +
   theme_minimal()
 
 
+# nieuwe data set met het gemiddelde ratio per jaar om een grafiek te plotten
+gemiddelde_ratio_per_jaar <- clean_data %>%
+  group_by(Perioden) %>%
+  summarise(gemiddelde_ratio = mean(Prijs.Inkomensratio, na.rm = TRUE))
+
+ggplot(gemiddelde_ratio_per_jaar, aes(x = Perioden, y = gemiddelde_ratio)) +
+  geom_line(color = "blue", size = 1) +
+  labs(title = "Gemiddelde ratio per jaar\n",
+       x = "Jaar\n",
+       y = "Gemiddelde ratio\n") +
+  scale_x_continuous ("jaar", breaks = 2011:2023) +
+  scale_y_continuous ("Gemiddelde ratio", breaks = 5:8, lim= c(5,8)) +
+  theme_minimal()
 
 
+quintiel_data <- clean_data %>%
+  filter(Perioden %in% c(2019, 2023)) %>%
+  group_by(Perioden) %>%
+  mutate(
+    PrijsInkomen_Quintiel = ntile(Prijs.Inkomensratio, 5)
+  ) %>%
+  ungroup()
+
+#selecteer de quintielen
+quintiel_2023 <- quintiel_data %>%
+  filter(Perioden == 2023)
+
+# Maak de boxplot
+ggplot(quintiel_2023, aes(x = as.factor(PrijsInkomen_Quintiel), y = Prijs.Inkomensratio)) +
+  geom_boxplot(fill = "skyblue", color = "darkblue") +
+  labs(
+    title = "Verdeling van Prijs-Inkomensratio per Quintiel (2023)",
+    x = "Quintiel",
+    y = "Prijs-Inkomensratio"
+  ) +
+  theme_minimal()
