@@ -75,13 +75,13 @@ kaart_met_data <- left_join(gemeente_map, pir_data, by = "statnaam")
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2019), color = "white") +
   scale_fill_viridis_c(option = "C", na.value = "grey90") +
-  labs(title = "Prijs/Inkomensratio per Gemeente (PIR) (2019)", fill = "PIR") +
+  labs(title = "Price/Income Ratio per Municipality (PIR) (2019)\n", fill = "PIR") +
   theme_minimal()
 
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2023), color = "white") +
   scale_fill_viridis_c(option = "C", na.value = "grey90") +
-  labs(title = "Prijs/Inkomensratio per Gemeente (PIR) (2023)", fill = "PIR") +
+  labs(title = "Price/Income Ratio per Municipality (PIR) (2023)\n", fill = "PIR") +
   theme_minimal()
 
 
@@ -92,11 +92,11 @@ gemiddelde_ratio_per_jaar <- clean_data %>%
 
 ggplot(gemiddelde_ratio_per_jaar, aes(x = Perioden, y = gemiddelde_ratio)) +
   geom_line(color = "blue", size = 1) +
-  labs(title = "Gemiddelde ratio per jaar\n",
-       x = "Jaar\n",
-       y = "Gemiddelde ratio\n") +
-  scale_x_continuous ("jaar", breaks = 2011:2023) +
-  scale_y_continuous ("Gemiddelde ratio", breaks = 5:8, lim= c(5,8)) +
+  labs(title = "Average Ratio per Year\n",
+       x = "Year\n",
+       y = "Average Ratio\n") +
+  scale_x_continuous ("Year", breaks = 2011:2023) +
+  scale_y_continuous ("Average Ratio", breaks = 5:8, lim= c(5,8)) +
   theme_minimal()
 
 
@@ -109,15 +109,29 @@ quintiel_data <- clean_data %>%
   ungroup()
 
 #selecteer de quintielen
+quintiel_2019 <- quintiel_data %>%
+  filter(Perioden == 2019)
+
 quintiel_2023 <- quintiel_data %>%
   filter(Perioden == 2023)
 
 # Maak de boxplot
+ggplot(quintiel_2019, aes(x = as.factor(PrijsInkomen_Quintiel), y = Prijs.Inkomensratio)) +
+  geom_boxplot(fill = "skyblue", color = "darkblue") +
+  labs(
+    title = "Distribution of Price-Income Ratio by Quintile based on the PIR (2019)",
+    x = "Quintile",
+    y = "Price/Income Ratio"
+  ) +
+  scale_y_continuous ("Price/Income Ratio", lim= c(4,11)) +
+  theme_minimal()
+
 ggplot(quintiel_2023, aes(x = as.factor(PrijsInkomen_Quintiel), y = Prijs.Inkomensratio)) +
   geom_boxplot(fill = "skyblue", color = "darkblue") +
   labs(
-    title = "Verdeling van Prijs-Inkomensratio per Quintiel (2023)",
-    x = "Quintiel",
-    y = "Prijs-Inkomensratio"
+    title = "Distribution of Price-Income Ratio by Quintile based on the PIR (2023)",
+    x = "Quintile",
+    y = "Price/Income Ratio"
   ) +
+  scale_y_continuous ("Price/Income Ratio", lim= c(4,11)) +
   theme_minimal()
