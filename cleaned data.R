@@ -83,7 +83,7 @@ ggplot(kaart_met_data) +
   theme_minimal()
 
 
-# nieuwe data set met het gemiddelde ratio per jaar om een grafiek te plotten
+# grafiek groei PIR
 gemiddelde_groei_per_jaar <- clean_data %>%
   group_by(Perioden) %>%
   summarise(gemiddelde_groei = mean(Groei_PIR, na.rm = TRUE))
@@ -98,6 +98,22 @@ ggplot(gemiddelde_groei_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
   scale_y_continuous ("Average growth", lim= c(-0.12,0.12)) +
   theme_minimal()
 
+#grafiek groei gemiddelde inkomen
+gemiddelde_groei_inkomen_per_jaar <- clean_data %>%
+  group_by(Perioden) %>%
+  summarise(gemiddelde_groei = mean(Groei_Inkomen, na.rm = TRUE))
+
+ggplot(gemiddelde_groei_inkomen_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
+  geom_line(color = "blue", size = 1) +
+  geom_hline(yintercept = 0, color = "black", size = 0.8) +
+  labs(title = "Average growth of the income per Year\n",
+       x = "Year\n",
+       y = "Average growth\n") +
+  scale_x_continuous ("Year", breaks = 2011:2023) +
+  scale_y_continuous ("Average growth") +
+  theme_minimal()
+
+#maken boxplots per quintiel
 quintiel_data <- clean_data %>%
   filter(Perioden %in% c(2019, 2023)) %>%
   group_by(Perioden) %>%
