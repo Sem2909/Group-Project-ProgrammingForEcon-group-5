@@ -1,3 +1,13 @@
+#installeren en inladen van de benodigde packages
+install.packages("tidyverse")
+install.packages("cbsodataR")
+install.packages("sf")
+install.packages("ggplot2")
+library(tidyverse)
+library(cbsodataR)
+library(sf)
+library(ggplot2)
+
 #inladen verschillende data sets
 data_set_huizenprijzen <- read.csv2(file.choose(), header = TRUE)
 data_set_inkomen <- read.csv2(file.choose(), header = TRUE)
@@ -30,10 +40,6 @@ clean_data <- na.omit(clean_data)
 clean_data$`Prijs Inkomensratio` <- clean_data[[3]] / clean_data[[4]]
 names(clean_data)[names(clean_data) == "Prijs Inkomensratio"] <- "Prijs.Inkomensratio"
 
-#installeren en inladen van de package tidyverse
-install.packages("tidyverse")
-library(tidyverse)
-
 # maken van nieuwe kolommen waarbij de groei ten opzichte van het vorige jaar word berekent
 clean_data <- clean_data %>%
   arrange(Regio.s, Perioden) %>%
@@ -55,14 +61,6 @@ data_2023 <- clean_data %>%
   select(Regio.s, PIR_2023 = 5)
 
 pir_data <- merge(data_2019, data_2023, by = "Regio.s")
-
-#installeren en inladen van de benodigde packages
-install.packages("cbsodataR")
-library(cbsodataR)
-install.packages("sf")
-install.packages("ggplot2")
-library(sf)
-library(ggplot2)
 
 #laad shapefile
 gemeente_map <- cbs_get_sf("gemeente", 2023, verbose = TRUE)
@@ -86,19 +84,19 @@ ggplot(kaart_met_data) +
 
 
 # nieuwe data set met het gemiddelde ratio per jaar om een grafiek te plotten
-gemiddelde_ratio_per_jaar <- clean_data %>%
+gemiddelde_groei_per_jaar <- clean_data %>%
   group_by(Perioden) %>%
-  summarise(gemiddelde_ratio = mean(Prijs.Inkomensratio, na.rm = TRUE))
+  summarise(gemiddelde_groei = mean(Groei_PIR, na.rm = TRUE))
 
-ggplot(gemiddelde_ratio_per_jaar, aes(x = Perioden, y = gemiddelde_ratio)) +
+ggplot(gemiddelde_groei_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
   geom_line(color = "blue", size = 1) +
-  labs(title = "Average Ratio per Year\n",
+  geom_hline(yintercept = 0, color = "black", size = 0.8) +
+  labs(title = "Average growth of the PIR per Year\n",
        x = "Year\n",
-       y = "Average PIR") +
+       y = "Average growth\n") +
   scale_x_continuous ("Year", breaks = 2011:2023) +
-  scale_y_continuous ("Average Ratio", breaks = 5:8, lim= c(5,8)) +
+  scale_y_continuous ("Average growth", lim= c(-0.12,0.12)) +
   theme_minimal()
-
 
 quintiel_data <- clean_data %>%
   filter(Perioden %in% c(2019, 2023)) %>%
