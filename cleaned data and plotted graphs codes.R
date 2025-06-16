@@ -10,8 +10,23 @@ library(sf)
 library(ggplot2)
 
 #inladen verschillende data sets
-data_set_huizenprijzen <- read_csv("data/Huisprijzen.csv")
-data_set_inkomen <- read_csv("data/Regionale_kerncijfers_Nederland_04062025_092105.csv")
+data_set_huizenprijzen <- read.csv2("data/Huisprijzen.csv")
+data_set_inkomen <- read.csv2("data/Regionale_kerncijfers_Nederland_04062025_092105.csv")
+
+data_set_bevolkingsdichtheid <- read.csv("data/Regionale_kerncijfers_Nederland_16062025_162909.csv")
+data_set_bevolkingsdichtheid <- data_set_bevolkingsdichtheid %>%
+  separate(
+    col = Perioden.Regio.s.Bevolking.Bevolkingssamenstelling.op.1.januari.Bevolkingsdichtheid..aantal.inwoners.per.km..,
+    into = c("Perioden", "Regio.s", "Bevolkingsdichtheid"),
+    sep = ";"
+  ) %>%
+  mutate(
+    Perioden = as.integer(Perioden),
+    Regio.s = trimws(Regio.s),
+    Bevolkingsdichtheid = as.numeric(Bevolkingsdichtheid)
+  ) %>%
+  filter(!is.na(Bevolkingsdichtheid))
+
 
 # Pak kolommen 1 t/m 3 uit huizenprijzen, bijvoorbeeld: Regio.s, Perioden, Verkoopprijs
 subset1 <- data_set_huizenprijzen[, 1:3]
@@ -73,13 +88,13 @@ kaart_met_data <- left_join(gemeente_map, pir_data, by = "statnaam")
 
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2019), color = "white") +
-  scale_fill_viridis_c(option = "C", na.value = "grey90") +
+  scale_fill_viridis_c(option = "C", na.value = "grey90", breaks = seq(5, 10, by = 1)) +
   labs(title = "Price/Income Ratio per Municipality (PIR) (2019)\n", fill = "PIR") +
   theme_minimal()
 
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2023), color = "white") +
-  scale_fill_viridis_c(option = "C", na.value = "grey90") +
+  scale_fill_viridis_c(option = "C", na.value = "grey90", breaks = seq(5, 10, by = 1)) +
   labs(title = "Price/Income Ratio per Municipality (PIR) (2023)\n", fill = "PIR") +
   theme_minimal()
 
@@ -91,6 +106,7 @@ gemiddelde_groei_per_jaar <- clean_data %>%
 
 ggplot(gemiddelde_groei_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
   geom_line(color = "blue", size = 1) +
+  geom_smooth(method = "lm", se = FALSE, color = "grey", linetype = "dashed") +
   geom_hline(yintercept = 0, color = "black", size = 0.8) +
   labs(title = "Average growth of the PIR per Year\n",
        x = "Year\n",
@@ -106,6 +122,7 @@ gemiddelde_groei_inkomen_per_jaar <- clean_data %>%
 
 ggplot(gemiddelde_groei_inkomen_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
   geom_line(color = "blue", size = 1) +
+    geom_smooth(method = "lm", se = FALSE, color = "grey", linetype = "dashed") +
   geom_hline(yintercept = 0, color = "black", size = 0.8) +
   labs(title = "Average growth of the income per Year\n",
        x = "Year\n",
@@ -114,40 +131,35 @@ ggplot(gemiddelde_groei_inkomen_per_jaar, aes(x = Perioden, y = gemiddelde_groei
   scale_y_continuous ("Average growth") +
   theme_minimal()
 
-#maken boxplots per quintiel
-quintiel_data <- clean_data %>%
-  filter(Perioden %in% c(2019, 2023)) %>%
-  group_by(Perioden) %>%
-  mutate(
-    PrijsInkomen_Quintiel = ntile(Prijs.Inkomensratio, 5)
-  ) %>%
-  ungroup()
+# maken van boxplot
+df_quintielen <- df_quintielen %>%
+  mutate(density_group = case_when(
+    Bevolkingsdichtheid_quintiel == 1 ~ "Very low density",
+    Bevolkingsdichtheid_quintiel == 2 ~ "Low density",
+    Bevolkingsdichtheid_quintiel == 3 ~ "Medium density",
+    Bevolkingsdichtheid_quintiel == 4 ~ "High density",
+    Bevolkingsdichtheid_quintiel == 5 ~ "Very high density"
+  ))
 
-#selecteer de quintielen
-quintiel_2019 <- quintiel_data %>%
-  filter(Perioden == 2019)
+# Zet juiste factorvolgorde 
+df_quintielen$density_group <- factor(df_quintielen$density_group,
+                                   levels = c("Very low density", "Low density",
+                                              "Medium density", "High density",
+                                              "Very high density"))
 
-quintiel_2023 <- quintiel_data %>%
-  filter(Perioden == 2023)
+# join de datasets
+df_complete <- clean_data %>%
+  left_join(df_quintielen %>% select(Regio.s, Perioden, density_group),
+            by = c("Regio.s", "Perioden"))
 
-# Maak de boxplot
-ggplot(quintiel_2019, aes(x = as.factor(PrijsInkomen_Quintiel), y = Prijs.Inkomensratio)) +
-  geom_boxplot(fill = "skyblue", color = "darkblue") +
+#Boxplot voor 2019 en 2023
+ggplot(df_complete %>% filter(Perioden %in% c(2019, 2023)),
+       aes(x = density_group, y = Prijs.Inkomensratio)) +
+  geom_boxplot(aes(fill = as.factor(Perioden))) +
   labs(
-    title = "Distribution of Price-Income Ratio by Quintile based on the PIR (2019)",
-    x = "Quintile",
-    y = "Price/Income Ratio"
+    title = "Price-to-Income Ratio by Population Density Group (2019 vs 2023)\n",
+    x = "Population Density Group\n",
+    y = "Price-to-Income Ratio\n",
+    fill = "Year"
   ) +
-  scale_y_continuous ("Price/Income Ratio", lim= c(4,11)) +
   theme_minimal()
-
-ggplot(quintiel_2023, aes(x = as.factor(PrijsInkomen_Quintiel), y = Prijs.Inkomensratio)) +
-  geom_boxplot(fill = "skyblue", color = "darkblue") +
-  labs(
-    title = "Distribution of Price-Income Ratio by Quintile based on the PIR (2023)",
-    x = "Quintile",
-    y = "Price/Income Ratio"
-  ) +
-  scale_y_continuous ("Price/Income Ratio", lim= c(4,11)) +
-  theme_minimal()
-
