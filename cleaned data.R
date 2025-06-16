@@ -9,8 +9,8 @@ library(sf)
 library(ggplot2)
 
 #inladen verschillende data sets
-data_set_huizenprijzen <- read.csv2(file.choose(), header = TRUE)
-data_set_inkomen <- read.csv2(file.choose(), header = TRUE)
+data_set_huizenprijzen <- read.csv2("C:/Users/semve/OneDrive/Documenten/GitHub/Group-Project-ProgrammingForEcon-group-5/data/Huisprijzen.csv", header = TRUE)
+data_set_inkomen <- read.csv2("C:/Users/semve/OneDrive/Documenten/GitHub/Group-Project-ProgrammingForEcon-group-5/data/Regionale_kerncijfers_Nederland_04062025_092105.csv", header = TRUE)
 
 # Pak kolommen 1 t/m 3 uit huizenprijzen, bijvoorbeeld: Regio.s, Perioden, Verkoopprijs
 subset1 <- data_set_huizenprijzen[, 1:3]
