@@ -94,7 +94,7 @@ ggplot(gemiddelde_ratio_per_jaar, aes(x = Perioden, y = gemiddelde_ratio)) +
   geom_line(color = "blue", size = 1) +
   labs(title = "Average Ratio per Year\n",
        x = "Year\n",
-       y = "Average Ratio\n") +
+       y = "Average PIR") +
   scale_x_continuous ("Year", breaks = 2011:2023) +
   scale_y_continuous ("Average Ratio", breaks = 5:8, lim= c(5,8)) +
   theme_minimal()
