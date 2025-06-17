@@ -88,13 +88,13 @@ kaart_met_data <- left_join(gemeente_map, pir_data, by = "statnaam")
 
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2019), color = "white") +
-  scale_fill_viridis_c(option = "C", na.value = "grey90", breaks = seq(5, 10, by = 1)) +
+  scale_fill_viridis_c(option = "C", na.value = "grey90", breaks = seq(5, 10, by = 1), lim = c(4, 11)) +
   labs(title = "Price/Income Ratio per Municipality (PIR) (2019)\n", fill = "PIR") +
   theme_minimal()
 
 ggplot(kaart_met_data) +
   geom_sf(aes(fill = PIR_2023), color = "white") +
-  scale_fill_viridis_c(option = "C", na.value = "grey90", breaks = seq(5, 10, by = 1)) +
+  scale_fill_viridis_c(option = "C", na.value = "grey90", breaks = seq(5, 10, by = 1), lim = c(4, 11)) +
   labs(title = "Price/Income Ratio per Municipality (PIR) (2023)\n", fill = "PIR") +
   theme_minimal()
 
@@ -132,6 +132,12 @@ ggplot(gemiddelde_groei_inkomen_per_jaar, aes(x = Perioden, y = gemiddelde_groei
   theme_minimal()
 
 # maken van boxplot
+df_quintielen <- data_set_bevolkingsdichtheid %>%
+  filter(!is.na(Bevolkingsdichtheid)) %>%               
+  group_by(Perioden) %>%                                
+  mutate(Bevolkingsdichtheid_quintiel = ntile(Bevolkingsdichtheid, 5)) %>%
+  ungroup()
+
 df_quintielen <- df_quintielen %>%
   mutate(density_group = case_when(
     Bevolkingsdichtheid_quintiel == 1 ~ "Very low density",
@@ -158,7 +164,7 @@ ggplot(df_complete %>% filter(Perioden %in% c(2019, 2023)),
   geom_boxplot(aes(fill = as.factor(Perioden))) +
   labs(
     title = "Price-to-Income Ratio by Population Density Group (2019 vs 2023)\n",
-    x = "Population Density Group\n",
+    x = "Quintiles of Population Density\n",
     y = "Price-to-Income Ratio\n",
     fill = "Year"
   ) +
