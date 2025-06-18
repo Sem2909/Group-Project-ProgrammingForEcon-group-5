@@ -9,31 +9,39 @@ output: pdf_document
 
 ```{r package_install, include=FALSE}
 install.packages("tidyverse")
+install.packages("cbsodataR")
+install.packages("sf")
+install.packages("ggplot2")
+
 ```
 
 ```{r packages}
-require(tidyverse)
+library(tidyverse)
+library(cbsodataR)
+library(sf)
+library(ggplot2)
 ```
 
 # Title Page
 
-Include your names
+Tobias van den Heuvel (2860237) 
+Sem Veenhof (2856000)
+Marnix Lakenman (2792960)
+Diaz Terpstra (2782131)
+Dennis Petrov ()
+Jan Wieger Overdijk (2782005)
+Bilal el Ausrouti (2825152)
 
-Include the tutorial group number
 
-Include your tutorial lecturer's name
+Tutorial group 1
+J.F.Fitzgerald
+
 
 # Part 1 - Identify a Social Problem
 
-Use APA referencing throughout your document. [Here's a link to some explanation.](https://www.mendeley.com/guides/apa-citation-guide/)
-
 ## 1.1 Describe the Social Problem
 
-Include the following:
-
--   Why is this relevant?
-
--   ...
+The rising housing prices in the Netherlands have become a significant social problem, as the costs make it incredibly difficult for young adults to leave their parent’s homes.Between 2015-16 and 2021-22, the proportion of young people (18-34 years) able to move out within two years fell from 51% to 45% (Statistics Netherlands, 2024a). In 2024 the average rents rose by approximately 5 - 5.7%, which is the steepest jump since 1993, with social housing rents climbing by 5.6 - 5.7% (Statistics Netherlands, 2024b).This sharp rise squeezes low and middle income households, reducing disposable income for other essentials. As housing costs rise faster than incomes, younger adults and lower income renters/buyers face worsening housing uncertainty. Overcrowding becomes more common, and many who are not able to afford purchasing a home are pushed into long waiting lists for social housing.
 
 # Part 2 - Data Sourcing
 
