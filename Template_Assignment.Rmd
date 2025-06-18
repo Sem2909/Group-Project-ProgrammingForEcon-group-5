@@ -39,16 +39,19 @@ Include the following:
 
 ## 2.1 Load in the data
 
-Data set verkoopprijs
+Data set verkoopprijs:
 https://opendata.cbs.nl/#/CBS/nl/dataset/83625NED/table?ts=1748853166332 
+We derived the data of the income per municipality by doing the following on the website on CBS. First, open the link to the correct page, then select at the filter “Onderwerp” all of the subjects under the tab “Inkomen en vermogen” (you should see a blue checkmark in a white little box next to “Inkomen en vermogen” and not a blue box). Next, select for “Perioden” all periods. And for “Regio’s” select all of the municipalities (i.e. “gemeenten per provincie”). Then click on “Download” at the right side of the page, and download as a “CSV met statistische symbolen”, this way you have downloaded the excel file with the correct data.
 
-Data set inkomen
+Data set inkomen:
 https://opendata.cbs.nl/#/CBS/nl/dataset/70072ned/table?ts=1748937008485 
+We derived the data of the housing prices per municipality by doing the following on the website on CBS. First open the second link to the correct page, then select at the filter “Onderwerp” all of the subjects. Next, select for “Perioden” all periods (1995-2023). Then select for “Regio’s” all of the “gemeenten per provincie”, you should see a blue checkmark in a white box at, “gemeenten per provincie” and at every province. So make sure you really have selected all municipalities. Then click on “Download” at the right side of the page, and download as a “CSV met statistische symbolen”, this way you have downloaded the excel file with the correct data.
 
-Data set bevolkingsdichtheid
+Data set bevolkingsdichtheid:
 https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1750083971495 
+We derived the data of population density by doing the following on the website on CBS. First open the third link to the correct page, then select at the filter 
+“Onderwerp” the box called “bevolkingsdichtheid”. To get to this box you have to deselect every subject (so no subjects are selected). then, click on the arrow at “Bevolking”, then on the arrow of “Bevolkingssamenstelling op 1 januari” then choose “bevolkingsdichtheid”. Make sure only bevolkingsdichtheid is selected. Next, select for “Perioden” all periods (1995-2023). Then select for “Regio’s” all of the “gemeenten per provincie”, you should see a blue checkmark in a white box at, “gemeenten per provincie” and at every province. So make sure you really have selected all municipalities. Then click on “Download” at the right side of the page, and download as a “CSV met statistische symbolen”, this way you have downloaded the excel file with the correct data.
 
-Preferably from a URL, but if not, make sure to download the data and store it in a shared location that you can load the data in from. Do not store the data in a folder you include in the Github repository!
 
 ```{r loading_data}
 data_set_huizenprijzen <- read.csv2("data/Huisprijzen.csv")
@@ -74,7 +77,7 @@ midwest is an example dataset included in the tidyverse package
 ## 2.2 Provide a short summary of the dataset(s)
 
 ```{r}
-head(dataset)
+head(subset1)
 head(subset2)
 head(data_set_bevolkingsdichtheid)
 ```
@@ -99,7 +102,7 @@ Categorical variables:
 
 Numerical variables:
  Average selling price per dwelling (in euros)
- Average disposable income per household (in euros)
+ Average disposable income per household (in thousands of euros)
  Number of dwellings / households
 
 
@@ -235,7 +238,9 @@ ggplot(kaart_met_data) +
 
 ```
 
-Here you provide a description of why the plot above is relevant to your specific social problem.
+These shapefiles, depicting the price by income ratio (PIR) in 2019 and 2023 in different municipalities, are highly relevant to our social problem to provide a good view of the income differences and house prices in all municipalities in the Netherlands. It clearly shows that in some municipalities it could be easier to buy a home than in other municipalities, that is because the mean salary and the price of homes of all municipalities in the Netherlands are different.
+The growth of the PIR across 2019 to 2023 also shows how the ratio changed during these years, which had a big impact on housing affordability and income. This clearly helps with our social problem, because with these shapefiles we are able to clearly depict the social problem on a map and therefore the right measures can be taken on a more specific level, namely on municipality level. 
+
 
 ## 3.5 Visualize sub-population variation
 
@@ -264,7 +269,23 @@ Here you provide a description of why the plot above is relevant to your specifi
 Analyze the relationship between two variables.
 
 ```{r analysis}
+# grafiek groei PIR
+gemiddelde_groei_per_jaar <- clean_data %>%
+  group_by(Perioden) %>%
+  summarise(gemiddelde_groei = mean(Groei_PIR, na.rm = TRUE))
 
+ggplot(gemiddelde_groei_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
+  geom_line(color = "blue", size = 1) +
+  geom_smooth(method = "lm", se = FALSE, color = "grey", linetype = "dashed") +
+  geom_hline(yintercept = 0, color = "black", size = 0.8) +
+  geom_vline(xintercept = 2020, linetype = "dotted", color = "red", size = 1) +
+  geom_vline(xintercept = 2022, linetype = "dotted", color = "red", size = 1) +
+  labs(title = "Average growth of the PIR per Year\n",
+       x = "Year\n",
+       y = "Average growth\n") +
+  scale_x_continuous ("Year", breaks = 2011:2023) +
+  scale_y_continuous ("Average growth", lim= c(-0.12,0.12)) +
+  theme_minimal()
 ```
 
 Here you provide a description of why the plot above is relevant to your specific social problem.
