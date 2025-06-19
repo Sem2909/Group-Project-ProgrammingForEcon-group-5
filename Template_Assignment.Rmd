@@ -1,6 +1,12 @@
 ---
-title: "Template"
-author: "Studentnames and studentnumbers here"
+title: "Price vs. Income: How (Un)affordable Has Housing Become?"
+author: "Tobias van den Heuvel (2860237) 
+Sem Veenhof (2856000)
+Marnix Lakenman (2792960)
+Diaz Terpstra (2782131)
+Dennis Petrov (2765841)
+Jan Wieger Overdijk (2782005)
+Bilal el Ausrouti (2825152)"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
@@ -8,10 +14,10 @@ output: pdf_document
 # Set-up your environment
 
 ```{r package_install, include=FALSE}
-install.packages("tidyverse")
-install.packages("cbsodataR")
-install.packages("sf")
-install.packages("ggplot2")
+# install.packages("tidyverse")
+# install.packages("cbsodataR")
+# install.packages("sf")
+# install.packages("ggplot2")
 
 ```
 
@@ -28,7 +34,7 @@ Tobias van den Heuvel (2860237)
 Sem Veenhof (2856000)
 Marnix Lakenman (2792960)
 Diaz Terpstra (2782131)
-Dennis Petrov ()
+Dennis Petrov (2765841)
 Jan Wieger Overdijk (2782005)
 Bilal el Ausrouti (2825152)
 
@@ -89,9 +95,9 @@ head(subset1)
 head(subset2)
 head(data_set_bevolkingsdichtheid)
 ```
-In this case, we see 4 variables in each dataset. These represent municipality-level indicators related to property values and income. However, we miss some information on the precise definitions or measurement units (e.g., whether income is gross or net, whether housing includes all dwelling types, inflation, etc.).
-These details are usually found in the metadata of CBS datasets. For this project, the metadata helps us understand the source, methodology, and relevance of each variable.
-
+The first dataset is from CBS, contains data about the mean income of a household per municipality and is called “Regionale kerncijfers Nederland”. The data ranges from 1995 to 2023, however not every year and region has all of the data, but most of the regions and years have.
+ The second dataset from CBS, contains data about the selling prices of houses per municipality and is called “Bestaande koopwoningen; gemiddelde verkoopprijzen, regio”, the data ranges from 1995 to 2023, however not every year and region have all data, but most of the regions and years have.
+ The Third dataset contains data about the population density in every municipality in the Netherlands. Also Here the data is derived from CBS and is called “Regionale kerncijfers Nederland”.
 
 ``` r
 inline_code = TRUE
@@ -193,22 +199,9 @@ ggplot(gemiddelde_groei_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
   scale_y_continuous ("Average growth", lim= c(-0.12,0.12)) +
   theme_minimal()
 
-#grafiek groei gemiddelde inkomen
-gemiddelde_groei_inkomen_per_jaar <- clean_data %>%
-  group_by(Perioden) %>%
-  summarise(gemiddelde_groei = mean(Groei_Inkomen, na.rm = TRUE))
 
-ggplot(gemiddelde_groei_inkomen_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
-  geom_line(color = "blue", size = 1) +
-    geom_smooth(method = "lm", se = FALSE, color = "grey", linetype = "dashed") +
-  geom_hline(yintercept = 0, color = "black", size = 0.8) +
-  labs(title = "Average growth of the income per Year\n",
-       x = "Year\n",
-       y = "Average growth\n") +
-  scale_x_continuous ("Year", breaks = 2011:2023) +
-  scale_y_continuous ("Average growth") +
-  theme_minimal()
 ```
+The temporal analysis of the average growth of the Price-to-Income Ratio (PIR) per year illustrates how the relationship between housing prices and average household income has evolved over time. This analysis is important because the PIR directly reflects housing affordability. An increasing PIR indicates that housing prices are rising faster than incomes, making it more difficult for households to afford a home. The graph shows significant increases in the PIR during the years 2015, 2020, and 2021, suggesting a decline in affordability during those periods. In contrast, the sharp drop in 2022 and 2023 may point to a price correction or income growth. By visualizing these annual fluctuations, the analysis highlights when imbalances between housing prices and income emerged, which is highly relevant to showcase the social problem.
 
 ## 3.4 Visualize spatial variation
 
@@ -270,7 +263,11 @@ ggplot(dataset, aes(x = inmetro, y = percadultpoverty)) +
   )
 ```
 
-Here you provide a description of why the plot above is relevant to your specific social problem.
+This boxplot, showing the price-to-income ratio (PIR) across different population density groups in both 2019 and 2023, is highly relevant to our social problem as it illustrates how housing affordability has developed over time in areas with varying levels of urbanization. It gives a clear overview of how much more difficult it has become to afford a house, especially in municipalities with higher population densities.
+The comparison between 2019 and 2023 reveals that the PIR has increased in all quintiles of population density, which means that house prices have grown faster than incomes in every group. However, the increase is most noticeable in medium to very high-density areas, where the affordability gap is becoming more severe. This reflects the pressure on urban housing markets and shows that people living in or moving to cities are being disproportionately affected.
+This data is important for our research, because it allows us to link population density directly to the affordability issue we are analyzing. It also supports our argument that the housing problem is not the same in every part of the country and that some areas need more targeted policy measures. By using this breakdown by density, we can better understand where affordability is declining the fastest and where interventions are most urgently needed.
+Overall, this figure adds depth to our analysis and strengthens the link between rising house prices, stagnant incomes, and increasing inequality in housing accessibility.
+
 
 ## 3.6 Event analysis
 
@@ -294,9 +291,28 @@ ggplot(gemiddelde_groei_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
   scale_x_continuous ("Year", breaks = 2011:2023) +
   scale_y_continuous ("Average growth", lim= c(-0.12,0.12)) +
   theme_minimal()
+
+#grafiek groei gemiddelde inkomen
+gemiddelde_groei_inkomen_per_jaar <- clean_data %>%
+  group_by(Perioden) %>%
+  summarise(gemiddelde_groei = mean(Groei_Inkomen, na.rm = TRUE))
+
+ggplot(gemiddelde_groei_inkomen_per_jaar, aes(x = Perioden, y = gemiddelde_groei)) +
+  geom_line(color = "blue", size = 1) +
+    geom_smooth(method = "lm", se = FALSE, color = "grey", linetype = "dashed") +
+  geom_hline(yintercept = 0, color = "black", size = 0.8) +
+  labs(title = "Average growth of the income per Year\n",
+       x = "Year\n",
+       y = "Average growth\n") +
+  scale_x_continuous ("Year", breaks = 2011:2023) +
+  scale_y_continuous ("Average growth") +
+  theme_minimal()
 ```
 
-Here you provide a description of why the plot above is relevant to your specific social problem.
+The coronavirus pandemic significantly intensified housing affordability issues, as seen by the sharp rise in the PIR from 2020 to 2022. This was driven by surging house prices, while income growth lagged, especially early in the pandemic. In times of economic concerns people fear their savings being eaten up by inflation and see purchasing properties as a safe investment. Lockdown and remote work further led more people into buying homes -. the prices in large urban municipalities continued to increase exponentially, however prices in smaller or rural municipalities also saw a drastic increase as people wanted to invest into more livable space (Klava, 2024).
+
+The average growth of income per year plummeted in 2020, as companies halted all recruitment and were hesitant to promote internally, possibly affected by the economic uncertainties. In 2023 a correction began and the income growth started recovering to pre-2020 numbers, but PIR remained elevated, particularly in urban and densely populated areas.
+
 
 # Part 4 - Discussion
 
@@ -306,8 +322,28 @@ Here you provide a description of why the plot above is relevant to your specifi
 
 ## 5.1 Github repository link
 
-Provide the link to your PUBLIC repository here: ...
+Provide the link to your PUBLIC repository here: https://github.com/Sem2909/Group-Project-ProgrammingForEcon-group-5
 
 ## 5.2 Reference list
 
-Use APA referencing throughout your document.
+Centraal Bureau voor de Statistiek. (2025, May 22). Bestaande koopwoningen; verkoopprijzen prijsindex 2020=100. https://opendata.cbs.nl/#/CBS/nl/dataset/85773NED/table?ts=1729589594896
+
+Centraal Bureau voor de Statistiek. (2025, February 17). Bestaande koopwoningen; gemiddelde verkoopprijzen, regio. https://opendata.cbs.nl/#/CBS/nl/dataset/83625NED/table?ts=1748853166332
+
+CBS Statline. (2, June, 2025.-a).
+https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1750083971495
+
+CBS Statline. (2, June, 2025.-b)
+https://opendata.cbs.nl/#/CBS/nl/dataset/70072ned/table?ts=1748937008485 
+
+CBS Statline. (17, Febuary, 2025.-c).
+https://opendata.cbs.nl/#/CBS/nl/dataset/83625NED/table?ts=1748853166332
+
+CBS Statistics Netherlands. (2024, June 19). Fewer young people are able to leave parental home.https://www.cbs.nl/en-gb/news/2024/25/fewer-young-people-are-able-to-leave-parental-home
+
+CBS Statistics Netherlands. (2024b, September 4). Rent increases the highest in over 30 years.https://www.cbs.nl/en-gb/news/2024/36/rent-increases-the-highest-in-over-30-years
+
+Klava, A. (2024, June). Housing Demand in a Work-From-Home Economy (Master’s Thesis, Vrije University Amsterdam)
+https://spatialeconomics.nl/wp-content/uploads/2024/10/STR_2024_KlavaA_Housing_Demand_in_a_Work_from_Home_Economy.pdf
+
+
