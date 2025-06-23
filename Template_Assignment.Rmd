@@ -7,7 +7,7 @@ Diaz Terpstra (2782131)
 Dennis Petrov (2765841)
 Jan Wieger Overdijk (2782005)
 Bilal el Ausrouti (2825152)"
-date: "`r Sys.Date()`"
+date: "`r Sys.Date(23/06/2025)`"
 output: pdf_document
 ---
 
@@ -102,8 +102,6 @@ The first dataset is from CBS, contains data about the mean income of a househol
 ``` r
 inline_code = TRUE
 ```
-
-These are things that are usually included in the metadata of the dataset. For your project, you need to provide us with the information from your metadata that we need to understand your dataset of choice.
 
 ## 2.3 Describe the type of variables included
 
@@ -245,22 +243,46 @@ The growth of the PIR across 2019 to 2023 also shows how the ratio changed durin
 
 ## 3.5 Visualize sub-population variation
 
-What is the poverty rate by state?
+What is the PIR per poppulation desinty quintile?
 
 ```{r visualise_subpopulations}
-dataset$inmetro <- dataset$inmetro %>% as.factor()
-# Boxplot of poverty rate by state using the 'midwest' dataset
-ggplot(dataset, aes(x = inmetro, y = percadultpoverty)) +
-  geom_boxplot() +
+df_quintielen <- data_set_bevolkingsdichtheid %>%
+  filter(!is.na(Bevolkingsdichtheid)) %>%               
+  group_by(Perioden) %>%                                
+  mutate(Bevolkingsdichtheid_quintiel = ntile(Bevolkingsdichtheid, 5)) %>%
+  ungroup()
+
+df_quintielen <- df_quintielen %>%
+  mutate(density_group = case_when(
+    Bevolkingsdichtheid_quintiel == 1 ~ "Very low density",
+    Bevolkingsdichtheid_quintiel == 2 ~ "Low density",
+    Bevolkingsdichtheid_quintiel == 3 ~ "Medium density",
+    Bevolkingsdichtheid_quintiel == 4 ~ "High density",
+    Bevolkingsdichtheid_quintiel == 5 ~ "Very high density"
+  ))
+
+# Zet juiste factorvolgorde 
+df_quintielen$density_group <- factor(df_quintielen$density_group,
+                                   levels = c("Very low density", "Low density",
+                                              "Medium density", "High density",
+                                              "Very high density"))
+
+# join de datasets
+df_complete <- clean_data %>%
+  left_join(df_quintielen %>% select(Regio.s, Perioden, density_group),
+            by = c("Regio.s", "Perioden"))
+
+#Boxplot voor 2019 en 2023
+ggplot(df_complete %>% filter(Perioden %in% c(2019, 2023)),
+       aes(x = density_group, y = Prijs.Inkomensratio)) +
+  geom_boxplot(aes(fill = as.factor(Perioden))) +
   labs(
-    title = "Distribution of Poverty Rates by Metropolitan status (Midwest counties)",
-    x = "Metropolitan Area",
-    y = "Poverty Rate of Adults (%)"
+    title = "Price-to-Income Ratio by Population Density Group (2019 vs 2023)\n",
+    x = "Quintiles of Population Density\n",
+    y = "Price-to-Income Ratio\n",
+    fill = "Year"
   ) +
-  theme_minimal() +
-  theme(
-    legend.position = "right"
-  )
+  theme_minimal()
 ```
 
 This boxplot, showing the price-to-income ratio (PIR) across different population density groups in both 2019 and 2023, is highly relevant to our social problem as it illustrates how housing affordability has developed over time in areas with varying levels of urbanization. It gives a clear overview of how much more difficult it has become to afford a house, especially in municipalities with higher population densities.
